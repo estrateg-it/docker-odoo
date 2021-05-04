@@ -55,15 +55,34 @@ RUN npm install -g rtlcss
 
 # Install Odoo
 ENV ODOO_VERSION 14.0
-ARG ODOO_RELEASE=20210427
-ARG ODOO_SHA=9d8e8038d5589bc8f4f5f012773dba4deefd3adc
+ARG ODOO_RELEASE=20210503
+ARG ODOO_SHA=ffa3a47055acb219e2c1a4f758e5456c5f659621
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
-RUN pip3 install num2words xlwt unicodecsv pysftp==0.2.9 poLib==1.1.1
+# Roberto Install extra libs
+#RUN pip3 install unicodecsv pysftp==0.2.9 poLib==1.1.1
+
+# -------- INICIO --------------------
+#RUN apt-get install build-essential \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    cargo
+
+RUN pip3 install cryptography
+
+RUN pip3 install \
+    pyOpenSSL \
+    unidecode \ 
+    xmltodict
+
+# -------- FIN ----------------------
 
 # Copy entrypoint script and Odoo configuration file
 COPY ./entrypoint.sh /
